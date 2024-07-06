@@ -1,0 +1,69 @@
+<link rel="icon" href="https://fav.farm/🔥" />
+<title>Cube Mesh</title>
+<style>
+	html,
+	body {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		background: #222;
+		touch-action: none;
+	}
+</style>
+
+<lume-scene id="scene" perspective="800" webgl>
+	<lume-point-light position="200 -200 200" intensity="0.6" color="white"></lume-point-light>
+	<lume-ambient-light color="white" intensity="0.6"></lume-ambient-light>
+
+	<lume-element3d size-mode="proportional proportional" size="1 1" style="border: 5px solid teal"></lume-element3d>
+
+	<lume-camera-rig
+		active
+		distance="1500"
+		max-distance="2500"
+		min-distance="100"
+		position="500 500 500"
+	></lume-camera-rig>
+
+	<!-- CONINUE FIXME: this works: -->
+	<!-- <lume-mesh has="sphere-geometry" size="30 30 30"></lume-mesh> -->
+	<!-- this doesn't: -->
+	<!-- <lume-mesh has="sphere-geometry phong-material" size="30 30 30"></lume-mesh> -->
+</lume-scene>
+
+<base href="https://docs.lume.io/" />
+<script src="./importmap.js"></script>
+<script type="module">
+	import {html, Motor} from 'lume'
+
+	const numberOfObjects = 10000
+
+	scene.append(html`
+		<lume-instanced-mesh id="mesh" color="white" count=${numberOfObjects} size="30 30 30"> </lume-instanced-mesh>
+	`)
+
+	mesh.rotations = Array.from({length: numberOfObjects * 3}).map(() => Math.random())
+	mesh.positions = Array.from({length: numberOfObjects * 3}).map(() => 1000 * Math.random())
+	mesh.scales = Array.from({length: numberOfObjects * 3}).map(() => Math.random())
+	mesh.colors = Array.from({length: numberOfObjects * 3}).map(() => Math.random())
+
+	Motor.addRenderTask(() => {
+		let i = 0
+		const a = mesh.rotations
+
+		for (const rot of a) {
+			a[i] += 0.01
+			i++
+		}
+
+		// Modifying the array in place does not trigger reactivity (arrays
+		// are currently not reactive) so we need to notify that the mesh
+		// needs to be re-rendered.
+		mesh.needsUpdate()
+
+		// If you wish to trigger reactivity for mesh.rotations in a case
+		// like this one, then do this:
+		// mesh.rotations = mesh.rotations
+	})
+</script>
